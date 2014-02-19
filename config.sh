@@ -2,22 +2,22 @@
 # Build configuration
 #
 # Set this to the name of the board you want to build
-ARMSTRAP_CONFIG="CubieBoard"
+ARMSTRAP_CONFIG="CubieBoard2"
 
 ##############################################################################
 # Basic configuration
 #
 # Set this to the hostname you want for the board, default is "armStrap"
-#ARMSTRAP_HOSTNAME="armStrap"
+ARMSTRAP_HOSTNAME="PHGateway"
 # Set this to the password you want for the root user, default is "armStrap"
-#ARMSTRAP_PASSWORD="armStrap"
+ARMSTRAP_PASSWORD="phGateway"
 
 ##############################################################################
 # TimeZone
 # If you want to select the timezone, set it here. If not, America/Montreal
 # is used as the default.
 #
-#ARMSTRAP_TIMEZONE="America/Montreal"
+ARMSTRAP_TIMEZONE="Etc/UTC"
 
 ##############################################################################
 # Locales
@@ -83,6 +83,7 @@ ARMSTRAP_CONFIG="CubieBoard"
 # You can add kernel modules to the default ones here
 #
 #ARMSTRAP_KERNEL_MODULES=""
+ARMSTRAP_KERNEL_MODULES="tty cdc_acm acm r8712u r8192s_usb r8192u_usb rt2870sta rt73usb rtl8187 rtl8192cu rt2500usb rt2501usb rt2800usb"
 
 ##############################################################################
 # BootLoader Section
@@ -91,13 +92,13 @@ ARMSTRAP_CONFIG="CubieBoard"
 # If you want to change the kernel root device (like for installing on NAND)
 # change it there... Default is to boot from first partition of SD card.
 #
-#ARMSTRAP_LOADER_ROOT="/dev/mmcblk0p1"
+ARMSTRAP_LOADER_ROOT="/dev/mmcblk0p1"
 
 ##############################################################################
 # Packages Sections
 #
 # If you want to install packages to the base distribution, add them here
-#ARMSTRAP_DPKG_EXTRAPACKAGES=""
+ARMSTRAP_DPKG_EXTRAPACKAGES="git-core apache2 isc-dhcp-server-ldap php5 libapache2-mod-php5 ntp cpufrequtils sysfsutils usbutils wvdial"
 #
 # If you want to reconfigure packages, add them here
 #ARMSTRAP_DPKG_RECONFIG=""
