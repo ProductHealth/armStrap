@@ -35,14 +35,14 @@ ARMSTRAP_TIMEZONE="Etc/UTC"
 # ArmStrap always create a swapfile, the default size is 128MB, you can
 # adjust the swapfile configuration here. Once the board is booted you can
 # always modify /etc/dphys-swapfile to change theses values.
-# 
+#
 # Size of the swap file (in MB), if 0, dphys-swapfile will try to guess
 # the correct size of the swapfile.
 #ARMSTRAP_SWAPSIZE="1024"
 # Location of the swap file
 #ARMSTRAP_SWAPFILE="/var/swap"
 #
-# If we are autodetecting swap size, this control its size  (SWAPSIZE = 
+# If we are autodetecting swap size, this control its size  (SWAPSIZE =
 # SWAPFACTOR x RAM)
 #ARMSTRAP_SWAPFACTOR="2"
 # The maximum size of the swapfile in autodetect mode
@@ -98,7 +98,7 @@ ARMSTRAP_LOADER_ROOT="/dev/mmcblk0p1"
 # Packages Sections
 #
 # If you want to install packages to the base distribution, add them here
-ARMSTRAP_DPKG_EXTRAPACKAGES="git-core apache2 isc-dhcp-server-ldap php5 libapache2-mod-php5 ntp cpufrequtils sysfsutils usbutils wvdial"
+#ARMSTRAP_DPKG_EXTRAPACKAGES="git-core apache2 isc-dhcp-server-ldap php5 libapache2-mod-php5 ntp cpufrequtils sysfsutils usbutils wvdial"
 #
 # If you want to reconfigure packages, add them here
 #ARMSTRAP_DPKG_RECONFIG=""
@@ -128,7 +128,7 @@ ARMSTRAP_DPKG_EXTRAPACKAGES="git-core apache2 isc-dhcp-server-ldap php5 libapach
 # If you want to name your image something else than the generated name
 #ARMSTRAP_IMAGE_NAME="wathever_you_want_to_name_your_image.img"
 # Specify the size of the image to be build in MB
-#ARMSTRAP_IMAGE_SIZE="2048"
+ARMSTRAP_IMAGE_SIZE="3072"
 
 ##############################################################################
 # armStrap Repository Enabler
