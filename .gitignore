@@ -22,3 +22,6 @@ boards/*/kernel/*custom_defconfig
 sdchroot
 config_local.sh
 
+# IDE
+.idea/
+

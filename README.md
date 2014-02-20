@@ -3,6 +3,22 @@ armStrap
 
 An universal sd/image creator for small arm development platform
 
+Prerequisite
+------------
+
+You will need to run this from Linux and it has been tested with Ubuntu 13.x 64bits
+
+You will need dpkg-dev installed:
+
+    sudo aptitude install dpkg-dev
+
+You will also need gcc for ARM:
+
+	sudo aptitude install gcc-4.8-arm-linux-gnueabihf
+	ln -s /usr/bin/arm-linux-gnueabihf-gcc-4.8 /usr/bin/arm-linux-gnueabihf-gcc
+
+
+
 QuickStart
 ----------
 
