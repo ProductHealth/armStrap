@@ -161,8 +161,8 @@ function kernelPack {
   echo "KERNEL_FWR=\"${TMP_KERNEL_FWR}\"" >> ${TMP_KERNEL_SCR}
   echo "" >> ${TMP_KERNEL_SCR}
   echo "touch /etc/apt/sources.list.d/armstrap.list" >> ${TMP_KERNEL_SCR}
-  echo "echo \"deb http://packages.vls.beaupre.biz/apt/armstrap/ ${TMP_BUILD_CFGTYP} main\" >> /etc/apt/sources.list.d/armstrap.list" >> ${TMP_KERNEL_SCR}
-  echo "echo \"deb-src http://packages.vls.beaupre.biz/apt/armstrap/ ${TMP_BUILD_CFGTYP} main\" >> /etc/apt/sources.list.d/armstrap.list" >> ${TMP_KERNEL_SCR}
+  echo "echo \"deb ${ARMSTRAP_ABUILDER_REPO_URL} ${TMP_BUILD_CFGTYP} main\" >> /etc/apt/sources.list.d/armstrap.list" >> ${TMP_KERNEL_SCR}
+  echo "echo \"deb-src ${ARMSTRAP_ABUILDER_REPO_URL} ${TMP_BUILD_CFGTYP} main\" >> /etc/apt/sources.list.d/armstrap.list" >> ${TMP_KERNEL_SCR}
   echo "TMP_GNUPGHOME=\"\${GNUPGHOME}\"" >> ${TMP_KERNEL_SCR}
   echo "export GNUPGHOME=\"\`mktemp -d\`\"" >> ${TMP_KERNEL_SCR}
   echo "chown \${USER}:\${USER} \${GNUPGHOME}" >> ${TMP_KERNEL_SCR}
@@ -253,7 +253,7 @@ function bootBuilder {
     mv ${ARMSTRAP_LOG_FILE} ${TMP_LOG}
     ARMSTRAP_LOG_FILE="${TMP_LOG}"
     case ${BUILD_BOOTLOADER_TYPE} in
-      "u-boot-sunxi") ARMSTRAP_GUI_PCT=$(guiWriter "add"  1 "Initializing ${BUILD_BOOTLOADER_TYPE} for ${BUILD_BOOTLOADER_NAME}")
+      u-boot-sunxi*) ARMSTRAP_GUI_PCT=$(guiWriter "add"  1 "Initializing ${BUILD_BOOTLOADER_TYPE} for ${BUILD_BOOTLOADER_NAME}")
                       printStatus "bootBuilder" "Initializing ${BUILD_BOOTLOADER_TYPE} for ${BUILD_BOOTLOADER_NAME}"
                       gitClone "${BUILD_BOOTLOADER_SOURCE}" "${BUILD_BOOTLOADER_GITSRC}" "${BUILD_BOOTLOADER_GITBRN}"
                       ARMSTRAP_GUI_PCT=$(guiWriter "add"  19 "Initializing ${BUILD_BOOTLOADER_TYPE} for ${BUILD_BOOTLOADER_NAME}")
@@ -263,15 +263,33 @@ function bootBuilder {
                       ccMake "${BUILD_BOOTLOADER_ARCH}" "${BUILD_BOOTLOADER_EABI}" "${BUILD_BOOTLOADER_SOURCE}" "${BUILD_BOOTLOADER_CFLAGS}" distclean
                       ARMSTRAP_GUI_PCT=$(guiWriter "add"  5 "Building")
                       printStatus "bootBuilder" "Building ${BUILD_BOOTLOADER_TYPE}"
-                      ccMake "${BUILD_BOOTLOADER_ARCH}" "${BUILD_BOOTLOADER_EABI}" "${BUILD_BOOTLOADER_SOURCE}" "${BUILD_BOOTLOADER_CFLAGS}" "${BUILD_BOOTLOADER_FAMILY}"
+                      ccMake "${BUILD_BOOTLOADER_ARCH}" "${BUILD_BOOTLOADER_EABI}" "${BUILD_BOOTLOADER_SOURCE}" "${BUILD_BOOTLOADER_CFLAGS}" "${BUILD_BOOTLOADER_FAMILY}_config"
+                      ccMake "${BUILD_BOOTLOADER_ARCH}" "${BUILD_BOOTLOADER_EABI}" "${BUILD_BOOTLOADER_SOURCE}" "${BUILD_BOOTLOADER_CFLAGS}" "${BUILD_BOOTLOADER_TARGET}"
                       ARMSTRAP_GUI_PCT=$(guiWriter "add"  50 "Building")
                       checkDirectory "${ARMSTRAP_PKG}/${BUILD_BOOTLOADER_TYPE}_${BUILD_BOOTLOADER_NAME}"
                       printStatus "bootBuilder" "Packaging ${BUILD_BOOTLOADER_TYPE}"
                       ARMSTRAP_GUI_PCT=$(guiWriter "add"  10 "Packaging")
-                      cp -v "${BUILD_BOOTLOADER_SOURCE}/u-boot-sunxi-with-spl.bin" "${ARMSTRAP_PKG}/${BUILD_BOOTLOADER_TYPE}_${BUILD_BOOTLOADER_NAME}" >> ${ARMSTRAP_LOG_FILE} 2>&1
-                      cp -v "${BUILD_BOOTLOADER_FEXSRC}/sys_config/${BUILD_BOOTLOADER_CPU}/${BUILD_BOOTLOADER_FEX}" "${ARMSTRAP_PKG}/${BUILD_BOOTLOADER_TYPE}_${BUILD_BOOTLOADER_NAME}" >> ${ARMSTRAP_LOG_FILE} 2>&1
+                      if [ -f "${BUILD_BOOTLOADER_SOURCE}/u-boot-sunxi-with-spl.bin" ]; then
+                        cp -v "${BUILD_BOOTLOADER_SOURCE}/u-boot-sunxi-with-spl.bin" "${ARMSTRAP_PKG}/${BUILD_BOOTLOADER_TYPE}_${BUILD_BOOTLOADER_NAME}" >> ${ARMSTRAP_LOG_FILE} 2>&1
+                      fi
+                      if [ -f "${BUILD_BOOTLOADER_SOURCE}/u-boot.bin" ]; then
+                        cp -v "${BUILD_BOOTLOADER_SOURCE}/u-boot.bin" "${ARMSTRAP_PKG}/${BUILD_BOOTLOADER_TYPE}_${BUILD_BOOTLOADER_NAME}" >> ${ARMSTRAP_LOG_FILE} 2>&1
+                      fi
+                      if [ -f "${BUILD_BOOTLOADER_SOURCE}/u-boot.img" ]; then
+                        cp -v "${BUILD_BOOTLOADER_SOURCE}/u-boot.img" "${ARMSTRAP_PKG}/${BUILD_BOOTLOADER_TYPE}_${BUILD_BOOTLOADER_NAME}" >> ${ARMSTRAP_LOG_FILE} 2>&1
+                      fi
+                      if [ -f "${BUILD_BOOTLOADER_SOURCE}/spl/sunxi-spl.bin" ]; then
+                        cp -v "${BUILD_BOOTLOADER_SOURCE}/spl/sunxi-spl.bin" "${ARMSTRAP_PKG}/${BUILD_BOOTLOADER_TYPE}_${BUILD_BOOTLOADER_NAME}" >> ${ARMSTRAP_LOG_FILE} 2>&1
+                      fi
+                      cp -v "${BUILD_BOOTLOADER_FEXSRC}/sys_config/${BUILD_BOOTLOADER_CPU}/${BUILD_BOOTLOADER_FEX,,}" "${ARMSTRAP_PKG}/${BUILD_BOOTLOADER_TYPE}_${BUILD_BOOTLOADER_NAME}" >> ${ARMSTRAP_LOG_FILE} 2>&1
+                      if [ -f "${TMP_BLRDIR}/.defaults/readme.txt" ]; then
+                        cp -v "${TMP_BLRDIR}/.defaults/readme.txt" "${ARMSTRAP_PKG}/${BUILD_BOOTLOADER_TYPE}_${BUILD_BOOTLOADER_NAME}" >> ${ARMSTRAP_LOG_FILE} 2>&1
+                      fi
+                      if [ -f "${TMP_BLRCFG}/readme.txt" ]; then
+                        cp -v "${TMP_BLRCFG}/readme.txt" "${ARMSTRAP_PKG}/${BUILD_BOOTLOADER_TYPE}_${BUILD_BOOTLOADER_NAME}/readme_${2}.txt" >> ${ARMSTRAP_LOG_FILE} 2>&1
+                      fi
                       ARMSTRAP_GUI_PCT=$(guiWriter "add"  5 "Packaging")
-                      ${ARMSTRAP_TAR_COMPRESS} "${ARMSTRAP_PKG}/${BUILD_BOOTLOADER_NAME}-${BUILD_BOOTLOADER_TYPE}${ARMSTRAP_TAR_EXTENSION}" -C "${ARMSTRAP_PKG}/${BUILD_BOOTLOADER_TYPE}_${BUILD_BOOTLOADER_NAME}" --one-file-system . >> ${ARMSTRAP_LOG_FILE} 2>&1
+                      ${ARMSTRAP_TAR_COMPRESS} "${ARMSTRAP_PKG}/${BUILD_BOOTLOADER_NAME,,}-${BUILD_BOOTLOADER_TYPE}${ARMSTRAP_TAR_EXTENSION}" -C "${ARMSTRAP_PKG}/${BUILD_BOOTLOADER_TYPE}_${BUILD_BOOTLOADER_NAME}" --one-file-system . >> ${ARMSTRAP_LOG_FILE} 2>&1
                       ARMSTRAP_GUI_PCT=$(guiWriter "add"  5 "Cleaning up")
                       rm -rf "${ARMSTRAP_PKG}/${BUILD_BOOTLOADER_TYPE}_${BUILD_BOOTLOADER_NAME}" >> ${ARMSTRAP_LOG_FILE} 2>&1
                       ccMake "${BUILD_BOOTLOADER_ARCH}" "${BUILD_BOOTLOADER_EABI}" "${BUILD_BOOTLOADER_SOURCE}" "${BUILD_BOOTLOADER_CFLAGS}" distclean
@@ -328,7 +346,7 @@ function rootfsUpdater {
     printStatus "rootfsUpdater" "Compressing root filesystem ${TMP_ROOTFS} to ${ARMSTRAP_PKG}"
     
     rm -f "${ARMSTRAP_PKG}/`basename ${BUILD_ROOTFS_URL}`"
-    ${ARMSTRAP_TAR_COMPRESS} "${ARMSTRAP_PKG}/${BUILD_ROOTFS_TYPE}-${BUILD_ROOTFS_FAMILY}-${BUILD_ROOTFS_ARCH}${ARMSTRAP_TAR_EXTENSION}" -C "${BUILD_ROOTFS_SRC}" --one-file-system ./ >> ${ARMSTRAP_LOG_FILE} 2>&1
+    ${ARMSTRAP_TAR_COMPRESS} "${ARMSTRAP_PKG}/${BUILD_ROOTFS_ARCH}-${BUILD_ROOTFS_TYPE}-${BUILD_ROOTFS_FAMILY}${ARMSTRAP_TAR_EXTENSION}" -C "${BUILD_ROOTFS_SRC}" --one-file-system ./ >> ${ARMSTRAP_LOG_FILE} 2>&1
     
     if [ -d "${BUILD_ROOTFS_SRC}" ]; then
       rm -rf "${BUILD_ROOTFS_SRC}"
@@ -436,7 +454,7 @@ function kernelPost {
     for TMP_I in ${ARMSTRAP_PKG}/*.sh; do
       mv -v ${TMP_I} ${ARMSTRAP_ABUILDER_KERNEL}/
     done
-    indexPost
+    #indexPost
   
     printStatus "armStrapPost" "Publishing kernels"
     for TMP_I in ${ARMSTRAP_PKG}/*.deb; do
@@ -459,7 +477,7 @@ function loaderPost {
       if [ ! -z "${ARMSTRAP_ABUILDER_REPO_ENABLE}" ]; then
         printStatus "armStrapPost" "Publishing bootloaders"
         mv -v ${ARMSTRAP_PKG}/`basename ${TMP_J}`-`basename ${TMP_I}`${ARMSTRAP_TAR_EXTENSION} ${ARMSTRAP_ABUILDER_LOADER}/
-        indexPost
+        #indexPost
       fi
     done
   done
@@ -476,7 +494,7 @@ function rootfsPost {
       if [ ! -z "${ARMSTRAP_ABUILDER_REPO_ENABLE}" ]; then
         printStatus "armStrapPost" "Publishing rootfs"
         mv -v ${ARMSTRAP_PKG}/`basename ${TMP_I}`-*-`basename ${TMP_J}`${ARMSTRAP_TAR_EXTENSION} ${ARMSTRAP_ABUILDER_ROOTFS}/
-        indexPost
+        #indexPost
       fi
     done
   done
