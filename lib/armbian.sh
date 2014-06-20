@@ -161,7 +161,7 @@ function chrootDPKG {
   
   printStatus "chrootDPKG" "Installing package ${TMP_DEB} in `basename ${TMP_CHROOT}`"
   cp -v ${2} ${TMP_DIR}/${TMP_DEB} >> ${ARMSTRAP_LOG_FILE} 2>&1
-  LC_ALL="" LANGUAGE="${BOARD_LANGUAGE}" LANG="${BOARD_LANG}" chroot ${TMP_CHROOT}/ /usr/bin/dpkg -i /${TMP_CHR}/${TMP_DEB} >> ${ARMSTRAP_LOG_FILE} 2>&1
+  LC_ALL="" LANGUAGE="${BOARD_LANGUAGE}" LANG="${BOARD_LANG}" chroot ${TMP_CHROOT}/ /usr/bin/dpkg -i --force-confdef /${TMP_CHR}/${TMP_DEB} >> ${ARMSTRAP_LOG_FILE} 2>&1
   rm -rf ${TMP_DIR}
     
   umountPFS "${TMP_CHROOT}"
@@ -548,8 +548,12 @@ function default_installRoot {
   
   ARMSTRAP_GUI_PCT=$(guiWriter "add"  1 "Updating RootFS")
   chrootUpgrade "${ARMSTRAP_MNT}"
-  
+
   ARMSTRAP_GUI_PCT=$(guiWriter "add"  19 "Configuring RootFS")
+  if [ -n "${ARMSTRAP_PRE_BOOTLOADER_PACKAGES}" ]; then
+    chrootInstall "${ARMSTRAP_MNT}" "${ARMSTRAP_PRE_BOOTLOADER_PACKAGES}"
+  fi
+
   if [ -n "${BOARD_DPKG_EXTRAPACKAGES}" ]; then
     chrootInstall "${ARMSTRAP_MNT}" "${BOARD_DPKG_EXTRAPACKAGES}"
   fi

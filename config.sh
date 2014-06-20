@@ -82,8 +82,7 @@ ARMSTRAP_TIMEZONE="Etc/UTC"
 #
 # You can add kernel modules to the default ones here
 #
-#ARMSTRAP_KERNEL_MODULES=""
-ARMSTRAP_KERNEL_MODULES="tty cdc_acm acm r8712u r8192s_usb r8192u_usb rt2870sta rt73usb rtl8187 rtl8192cu rt2500usb rt2501usb rt2800usb"
+ARMSTRAP_KERNEL_MODULES="tty cdc_acm acm rt2800usb"
 
 ##############################################################################
 # BootLoader Section
@@ -105,7 +104,11 @@ ARMSTRAP_LOADER_ROOT="/dev/mmcblk0p1"
 # Packages Sections
 #
 # If you want to install packages to the base distribution, add them here
-#ARMSTRAP_DPKG_EXTRAPACKAGES="git-core apache2 isc-dhcp-server-ldap php5 libapache2-mod-php5 ntp cpufrequtils sysfsutils usbutils wvdial"
+#ARMSTRAP_DPKG_EXTRAPACKAGES=""
+
+# MNG: to install before boot loader (i.e. pre-req for boot loader package)
+ARMSTRAP_PRE_BOOTLOADER_PACKAGES="libusb-1.0-0"
+
 #
 # If you want to reconfigure packages, add them here
 #ARMSTRAP_DPKG_RECONFIG=""
@@ -143,3 +146,4 @@ ARMSTRAP_IMAGE_SIZE="3072"
 # Unless you're me, or you want to run your own repo with your own builds leave
 # this option commented out.
 #ARMSTRAP_ABUILDER_REPO_ENABLE="Yes"
+
